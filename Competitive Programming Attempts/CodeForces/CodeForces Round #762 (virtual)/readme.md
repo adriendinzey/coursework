@@ -1,4 +1,5 @@
-# Result 2/8 submissions accepted
+# Result Summary 
+## 2/8 submissions accepted
 [Link to contest](https://codeforces.com/contest/1619)
 ### Notes
 Immediately after I finished this one I realized my issue was not trusting Python's integer division as I incorrectly read its description as rounding to the nearest integer. 
