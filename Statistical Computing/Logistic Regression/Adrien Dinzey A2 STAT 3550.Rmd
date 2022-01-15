@@ -1,0 +1,152 @@
+---
+title: "STAT 3550 A2"
+author: "Adrien Dinzey"
+date: "29/03/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library('readxl')
+library(aod)
+library(survey)
+```
+
+## 4.5
+# (a)
+```{r,message=FALSE,warning=FALSE}
+mydata <- read_excel("Ex4.5-Anand.xlsx")
+mydata$P<-mydata$P/100
+logitRegression <- glm(P ~ A + B + C + D, data = mydata,family = binomial)
+summary(logitRegression)
+confint(logitRegression)
+```
+# (b)
+
+```{r,message=FALSE,warning=FALSE}
+mydata <- read_excel("Ex4.5-Anand.xlsx")
+mydata$P<-mydata$P/100
+logitRegression <- glm(P ~ A + B + C + D, data = mydata,family = binomial(link = "probit"))
+summary(logitRegression)
+confint(logitRegression)
+```
+
+# (c)
+we see that while they use the same number of Fisher Scoring iterations, the deviance is about the same and the z values for the estimates are also about the same, the actual estimates themselves are different. This is due to the fact that logit and probit have different link functions. 
+
+# (d)
+```{r,message=FALSE,warning=FALSE}
+mydata <- read_excel("Ex4.5-Anand.xlsx")
+mydata$P<-mydata$P/100
+logitRegression <- glm(P ~ A + B + C + D, data = mydata,family = poisson)
+summary(logitRegression)
+confint(logitRegression)
+```
+
+The poisson regression is very different from the previous two, , although it has a similar 5 number summary the estimates are extremely different. The deviance is somewhat different and the AIC is calculated as inf. Despite this, the z values are still very similar to the previous two techniques.
+
+## 4.10
+```{r}
+mydata <- read_excel("Ex4.10-popcorn.xlsx")
+poissonReg <- glm(y ~ Temperature + Oil + Time, data = mydata,family = poisson)
+summary(poissonReg)
+confint(poissonReg)
+```
+
+## 4.18
+
+# (a)
+```{r}
+mydata <- read_excel("4.18.xlsx")
+logitRegression <- glm(y ~ x1+x2, data = mydata,family = binomial)
+summary(logitRegression)
+confint(logitRegression)
+```
+
+# (b)
+```{r}
+summaryLog <- summary(logitRegression)
+1 - summaryLog$deviance / summaryLog$null.deviance
+```
+
+We see that R^2 is large enough that we fail to reject the null hypothesis and say this model is adequate based off its deviance.
+
+# (c)
+```{r}
+exp(coef(logitRegression))
+```
+
+Since the odds ratio for x1 is close to 1, there is close to no change in the probability of success, while a change in x2 by 1 increases the probability of success by a factor of 2.68555
+
+# (d)
+```{r}
+newData<-data.frame(x1=45000,x2=5)
+predict(logitRegression,newData,type="response")
+```
+
+The probability of this is 0.7710279 according to this model.
+
+# (e)
+```{r}
+mydata <- read_excel("4.18.xlsx")
+logitRegression <- glm(y ~ x1*x2, data = mydata,family = binomial)
+summary(logitRegression)
+exp(coef(logitRegression))
+```
+The interaction term has very little affect on the response variable due to the fact that it has an odds ratio very close to 1. Therefore, there is evidence this term is not required in the model.
+
+# (f)
+The sigma values of x1 and x2 are 6.371e-05 and 5.274e-01 respectively.
+
+# (g)
+```{r}
+mydata <- read_excel("4.18.xlsx")
+logitRegression <- glm(y ~ x1+x2, data = mydata,family = binomial)
+confint(logitRegression)
+```
+
+## 4.19
+# (a)
+```{r}
+data1 <-read_excel("4.19.xlsx")
+poisReg<- glm( F~ Months, data = data1,family = poisson)
+summary(poisReg)
+```
+
+# (b)
+```{r}
+summaryLog <- summary(poisReg)
+1 - summaryLog$deviance / summaryLog$null.deviance
+```
+Because of this R^2 value, we fail to reject the null hypothesis at any reasonable confidence level, and so we can conclude that this model is a good fit.
+
+# (c)
+```{r}
+range(data1$Months)
+xVals<-seq(1,35,0.001)
+yVals<-predict(poisReg,list(Months=xVals),type="response")
+plot(data1$Months,data1$F,xlab="Months",ylab="Number of Failures")
+lines(xVals,yVals)
+```
+
+# (d)
+```{r}
+poisReg2<- glm( F~ Months+I(Months^2), data = data1,family = poisson)
+summary(poisReg2)
+exp(coef(logitRegression))
+```
+Since the odds ratio for Months on its own is close to 1 it implies that it does not affect the probability of breaking very much, while the odds ratio of the quadratic term shows that it does have an effect on the probability of breaking meaning this is evidence that the term is required in the model.
+
+# (e)
+```{r}
+regTermTest(poisReg,"Months", method=c("Wald"))
+```
+
+The Wald Test F statistic is 28.83483 for Months.
+
+# (f)
+
+```{r}
+confint(poisReg)
+```

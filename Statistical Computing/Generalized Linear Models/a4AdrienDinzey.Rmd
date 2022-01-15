@@ -1,0 +1,115 @@
+---
+title: "A4"
+author: "Adrien Dinzey, 7842736"
+date: "23/04/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Q1
+
+load in data:
+```{r}
+library('readxl')
+data1<-read_excel("A4-datasets.xlsx")
+```
+
+Using the cannonical link (that is the recirpocal for Gamma dsitribution)
+```{r}
+data1.model<-glm(y~x1+x2+x3,family=Gamma(),data=data1)
+summary(data1.model)
+yhat<-data1.model$fit
+dev_res<-residuals(data1.model,c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data1$x1,dev_res)
+plot(data1$x2,dev_res)
+plot(data1$x3,dev_res)
+
+```
+
+Using the log link
+```{r}
+data1.model<-glm(y~x1+x2+x3,family=Gamma(link=log),data=data1)
+summary(data1.model)
+yhat<-data1.model$fit
+dev_res<-residuals(data1.model,c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data1$x1,dev_res)
+plot(data1$x2,dev_res)
+plot(data1$x3,dev_res)
+
+```
+
+We see that the residuals seem to be distributed the same way using either link. The QQ plot of the canonical link seems to look like a normal qq plot while the log link qq plot has a bit of a bend near the middle and is pushed upwards.
+
+# Q2
+```{r}
+data2<-read_excel("A4-datasets.xlsx",sheet = 2)
+```
+
+```{r}
+data2.model<-glm(y~x,family = "poisson",data2)
+summary(data2.model)
+yhat <- data2.model$fit
+dev_res <- residuals(data2.model, c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data2$x,dev_res)
+```
+We see that the residuals plotted against yhat seems to look like some sort of F distribution while when plotted against x it looks like an upside down parabola. Its possible that a power link would be better suited for this.
+
+# Q3
+```{r}
+data3<-read_excel("A4-datasets.xlsx",sheet=3)
+```
+
+```{r}
+data3.model<-glm(y~x1+x2+x3,family=Gamma(link=power(1/2)),data=data3)
+summary(data3.model)
+yhat<-data3.model$fit
+dev_res<-residuals(data3.model,c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data3$x1,dev_res)
+plot(data3$x2,dev_res)
+plot(data3$x3,dev_res)
+```
+
+# Q4
+
+```{r}
+data4<-read_excel("A4-datasets.xlsx",sheet = 4)
+```
+
+Using canonical link
+```{r}
+data4.model<-glm(NO~x1+x2+x3,family = poisson,data4)
+summary(data4.model)
+yhat <- data4.model$fit
+dev_res <- residuals(data4.model, c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data4$x1,dev_res)
+plot(data4$x2,dev_res)
+plot(data4$x3,dev_res)
+```
+Using log link
+```{r}
+data4.model<-glm(NO~x1+x2+x3,family = poisson(link=log),data4)
+summary(data4.model)
+yhat <- data4.model$fit
+dev_res <- residuals(data4.model, c="deviance")
+qqnorm(dev_res)
+plot(yhat,dev_res)
+plot(data4$x1,dev_res)
+plot(data4$x2,dev_res)
+plot(data4$x3,dev_res)
+```
+
+We see we get the exact same answer using log link or canonical link here because the canonical link for poisson distribution is the log link.
